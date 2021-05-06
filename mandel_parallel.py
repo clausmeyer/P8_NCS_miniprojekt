@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May  5 13:55:02 2021
+Created on Wed May  5 15:58:45 2021
 
 @author: claus
 """
-import numpy as np
+
+import time
+
 import matplotlib.pyplot as mplpp
+import numpy as np
+#import mandel_functions as mf
 import multiprocessing as mp
+
 
 def create_datapoints(RE_points: int, IM_points: int):
 
@@ -37,10 +42,27 @@ def parallel_setup(P,N):
     pool = mp.Pool(processes=P)
 
 
-    res = [pool.apply_async(mf.mandelbrot_parallel, (para_grid[i,:,:],80,30,P)) for i in range(N)]
+    res = [pool.apply_async(mandelbrot_parallel, (para_grid[i,:,:],80,30,P)) for i in range(N)]
 
     pool.close()
     pool.join()
-    K_values = [res.get() for result in res]
-    return K_values
+    #K_values = [res.get() for result in res]
+    return res
     
+if __name__ == '__main__':
+    P = 16 # number of processors
+    N = P
+    L = 100
+    RE_points = 1000
+    IM_points = 1000
+
+    grid = create_datapoints(RE_points,IM_points)
+    para_grid = np.zeros((P,int(RE_points/2),int(IM_points/(P/2))), dtype = np.complex128)
+    for i in range(int(P/2)):
+        para_grid[i,:,:] = grid[0:int(1000/2),0:int(1000/(P/2))]
+         #para_grid = grid[0:int(1000/2),0:int(1000/(P/2))]
+    # res = mandelbrot_vectorized(para_grid,80,30)
+    # mf.plot_mandel(res)
+
+    res = parallel_setup(P,N)
+   # plot_mandel(res)
