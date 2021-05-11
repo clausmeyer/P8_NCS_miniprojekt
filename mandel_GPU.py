@@ -48,7 +48,7 @@ def mandel_gpu(Z_host,C_host,M_host):
         """).build()
         
         
-    prg.mandelbrot_gpu(queue, [Z_host.shape[0]],None,C_gpu,Z_gpu,M_gpu)
+    prg.mandelbrot_gpu(queue, Z_host.shape[0],None,C_gpu,Z_gpu,M_gpu)
     cl.enqueue_copy(queue, M_host, M_gpu)
 
     
