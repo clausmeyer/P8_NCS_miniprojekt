@@ -33,30 +33,14 @@ def mandelbrot_parallel(c_grid, MAX_ITER, THRESHOLD, processes):
         M[np.abs(Z) > THRESHOLD] = False  # The bool array M keeping track of which entries has diverged is updated
     return diverge_time
 
-# def parallel_setup(P,N):
-#     pool = mp.Pool(processes=P)
+def parallel_setup(P,N):
+    pool = mp.Pool(processes=P)
 
 
-#     res = [pool.apply_async(mf.mandelbrot_parallel, (para_grid[i,:,:],80,30,P)) for i in range(N)]
+    res = [pool.apply_async(mf.mandelbrot_parallel, (para_grid[i,:,:],80,30,P)) for i in range(N)]
 
-#     pool.close()
-#     pool.join()
-#     K_values = [res.get() for result in res]
-#     return K_values
+    pool.close()
+    pool.join()
+    K_values = [res.get() for result in res]
+    return K_values
     
-
-def mandelbrot_vectorized(c_grid, MAX_ITER, THRESHOLD):
-
-    rows = len(c_grid)
-    cols = len(c_grid[0])
-     
-    Z = np.zeros((rows, cols), dtype=np.complex128)
-    M = np.full((rows, cols), True, dtype=bool)
-    diverge_time = np.zeros(Z.shape, dtype=int)
-
-    for i in range(MAX_ITER):
-        Z[M] = Z[M]**2 + c_grid[M]             # Performs the multiplication as a matrix multiplication and adds the corresponding C term to each entry
-        diverged = np.greater(np.abs(Z),THRESHOLD,out=np.full(c_grid.shape,False), where=M)   # Finds which entries has diverged beyond threshold
-        diverge_time[diverged] = i        # If an entry has diverged, its iteration count is saved
-        M[np.abs(Z) > THRESHOLD] = False  # The bool array M keeping track of which entries has diverged is updated
-    return diverge_time
